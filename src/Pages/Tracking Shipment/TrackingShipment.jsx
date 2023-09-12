@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import Table from "react-bootstrap/Table";
 
 const TrackingShipment = () => {
   const [enteredReceipt, setEnteredReceipt] = useState("");
-  const [shipmentData, setShipmentData] = useState(null);
+  const [resiInfo, setResiInfo] = useState([]);
   const endpoint = "https://partner-api.21express.co.id/publics/tracking";
   const siscoToken =
     "TOBGOAV5ULI/QGN8UQCKY9M6SNP+5TZZLN/JDFLXCUSKIDADBZ6MNQWLJPVE9JKY";
@@ -35,9 +36,11 @@ const TrackingShipment = () => {
       });
 
       if (response.status === 200) {
-        setShipmentData(response.data.express21.results);
+        console.log(response.data.express21.results);
+        setResiInfo(response.data.express21.results.resi_info);
       } else {
         console.error("API Error - Status Code:", response.status);
+     
       }
     } catch (error) {
       console.error("API Error:", error);
@@ -56,12 +59,31 @@ const TrackingShipment = () => {
         />
         <button type="submit">Enter</button>
       </form>
-      {shipmentData && (
-        <div>
-          <h2>Shipment Information</h2>
-          <pre>{JSON.stringify(shipmentData, null, 2)}</pre>
-        </div>
-      )}
+
+      {resiInfo.map((data) => {
+        return (
+          <Table striped bordered border={1} hover key={data.consignee_name}>
+            <thead>
+              <tr>
+                <th>City Destination</th>
+                <th>City Origin</th>
+                <th>Consignee Name</th>
+                <th>Service Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{data.city_dest}</td>
+                <td>{data.city_origin}</td>
+                <td>{data.consignee_name}</td>
+                <td>{data.service_type}</td>
+                <td>{data.last_status_code}</td>
+              </tr>
+            </tbody>
+          </Table>
+        );
+      })}
     </div>
   );
 };
